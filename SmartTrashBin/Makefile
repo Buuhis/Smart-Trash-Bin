@@ -1,7 +1,7 @@
 PROJECT = trash_can_control
 BUILD_DIR = bin
 
-CFILES = src/main.c src/srf05.c src/servo.c src/systick_delay.c
+CFILES = src/main.c src/srf05.c src/servo.c src/systick_delay.c src/button.c
 
 DEVICE = stm32f411ceu6
 OOCD_FILE = board/stm32f4discovery.cfg
