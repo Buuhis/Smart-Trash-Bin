@@ -16,7 +16,7 @@ void uart_init(uint32_t baudrate) {
     usart_set_baudrate(USART2, baudrate);
     usart_set_databits(USART2, 8);
     usart_set_stopbits(USART2, USART_STOPBITS_1);
-    usart_set_mode(USART2, USART_MODE_TX);
+    usart_set_mode(USART2, USART_MODE_TX_RX); // Enable both TX and RX
     usart_set_parity(USART2, USART_PARITY_NONE);
     usart_set_flow_control(USART2, USART_FLOWCONTROL_NONE);
     usart_enable(USART2);
@@ -29,4 +29,10 @@ void uart_write(const char *str) {
         }
         usart_send_blocking(USART2, *str++);
     }
+}
+
+char uart_read_char(void) {
+    // Wait until data is available in the receive register
+    while (!(USART_SR(USART2) & USART_SR_RXNE));
+    return (char)usart_recv(USART2); // Read and return the received character
 }

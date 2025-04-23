@@ -1,5 +1,6 @@
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/cm3/systick.h>
+#include <libopencm3/stm32/usart.h>
 #include <stdio.h>
 #include <string.h>
 #include "vl53l0x.h"
@@ -18,7 +19,7 @@ int main(void) {
     // Clock setup: HSI 16 MHz
     rcc_set_sysclk_source(RCC_CFGR_SW_HSI);
     while (!rcc_is_osc_ready(RCC_HSI));
-    rcc_ahb_frequency = 16000000;
+    rcc_ahb_frequency  = 16000000;
     rcc_apb1_frequency = 16000000;
     rcc_apb2_frequency = 16000000;
 
@@ -46,8 +47,8 @@ int main(void) {
     sh1106_display(I2C2);
 
     // Servo initial state
-    servo_set_angle(0); // Start with lid closed
-    bool is_open = false; // Track lid state
+    servo_set_angle(0);        // Start with lid closed
+    bool is_open = false;      // Track lid state
 
     // Main loop
     while (1) {
@@ -94,7 +95,7 @@ int main(void) {
                 sh1106_draw_string(10, 16, "Toi no roi :((");
                 sh1106_display(I2C2);
             }
-            snprintf(buf, sizeof(buf), "Distance: %u cm\r\n", distance_cm);
+            // snprintf(buf, sizeof(buf), "Distance: %u cm\r\n", distance_cm);
             uart_write(buf);
         }
 
@@ -103,8 +104,8 @@ int main(void) {
         if (distance_srf05 < DISTANCE_THRESHOLD && distance_srf05 > 0) {
             servo_set_angle(135); // Open lid
             is_open = true;
-            delay_ms(5000); // Wait 5 seconds
-            servo_set_angle(0); // Close lid
+            delay_ms(5000);       // Wait 5 seconds
+            servo_set_angle(0);   // Close lid
             is_open = false;
         }
 
@@ -116,6 +117,32 @@ int main(void) {
             } else {
                 servo_set_angle(135); // Open lid
                 is_open = true;
+            }
+        }
+
+        // UART-based control
+        if (usart_get_flag(USART2, USART_FLAG_RXNE)) { // Check if data is available
+            char cmd = uart_read_char();
+            switch (cmd) {
+                case 's': // Show status
+                    uart_write(is_open ? "Bin is open\r\n" : "Bin is closed\r\n");
+                    break;
+                case 'o': // Open bin
+                    servo_set_angle(135);
+                    is_open = true;
+                    uart_write("Bin opened\r\n");
+                    break;
+                case 'c': // Close bin
+                    servo_set_angle(0);
+                    is_open = false;
+                    uart_write("Bin closed\r\n");
+                    break;
+                case 't': //Show control 
+                    uart_write("s: Show status\r\n");
+                    uart_write("o: Open bin\r\n");
+                    uart_write("c: Close bin\r\n");
+                default:
+                    break;
             }
         }
 
