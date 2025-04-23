@@ -1,5 +1,5 @@
 #include "srf05.h"
-#include "systick_delay.h"
+#include "delay.h"
 
 void srf05_init(void) {
     // Enable clock for GPIOA

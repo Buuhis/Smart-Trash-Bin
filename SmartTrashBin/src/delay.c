@@ -1,9 +1,10 @@
-#include "systick_delay.h"
+#include "delay.h"
 
 static volatile uint32_t tick = 0;
 
-void systick_delay_init(void) {
-    systick_set_reload(16000 - 1); // 16MHz clock, 1ms tick
+void delay_init(void) {
+    // Configure SysTick for 1ms interrupts
+    systick_set_reload(16000 - 1); // 16 MHz clock, 1ms tick
     systick_set_clocksource(STK_CSR_CLKSOURCE_AHB);
     systick_counter_enable();
     systick_interrupt_enable();

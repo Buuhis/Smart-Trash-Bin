@@ -1,5 +1,5 @@
 #include "button.h"
-#include "systick_delay.h"
+#include "delay.h"
 
 void button_init(void) {
     // Enable clock for GPIOB
