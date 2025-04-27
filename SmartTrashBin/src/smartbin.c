@@ -96,8 +96,8 @@ void smartbin_run(void) {
                 sh1106_display(I2C2);
             }
 
-            // snprintf(buf, sizeof(buf), "Distance: %u cm\r\n", distance_cm);
-            uart_write(buf);
+            // snprintf(buf, sizeof(buf), "Distance: %u mm\r\n", distance_cm);
+            //uart_write(buf);
         }
 
         // SRF05-based automatic lid control
@@ -143,7 +143,11 @@ void smartbin_run(void) {
                     uart_write("s: Show status\r\n");
                     uart_write("o: Open bin\r\n");
                     uart_write("c: Close bin\r\n");
+                    uart_write("p: Print space of bin\r\n");
                     break;
+                case 'p': 
+                    snprintf(buf, sizeof(buf), "Space: %u mm\r\n", distance_vl53);
+                    uart_write(buf);
                 default:
                     break;
             }
