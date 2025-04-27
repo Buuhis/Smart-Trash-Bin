@@ -61,7 +61,7 @@ void smartbin_run(void) {
             sh1106_draw_string(10, 16, "Error!");
             sh1106_display(I2C2);
         } else {
-            uint16_t distance_cm = distance_vl53 / 10; // mm to cm
+            //uint16_t distance_cm = distance_vl53 / 10; // mm to cm
 
             if (distance_cm > 40) {
                 led_off(LED_GREEN);
@@ -123,6 +123,7 @@ void smartbin_run(void) {
 
         // UART-based control
         if (usart_get_flag(USART2, USART_FLAG_RXNE)) { // Check if data is available
+            uint16_t distance_cm = distance_vl53 / 10; // mm to cm
             char cmd = usart_recv_blocking(USART2); // Read character
 
             switch (cmd) {
@@ -146,7 +147,7 @@ void smartbin_run(void) {
                     uart_write("p: Print space of bin\r\n");
                     break;
                 case 'p': 
-                    snprintf(buf, sizeof(buf), "Space: %u mm\r\n", distance_vl53);
+                    snprintf(buf, sizeof(buf), "Space: %u cm\r\n", distance_cm);
                     uart_write(buf);
                 default:
                     break;
